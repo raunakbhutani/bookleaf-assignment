@@ -1,0 +1,5 @@
+# Local configuration and generated output must not be committed.
+node_modules/
+client/dist/
+.env
+tmp/
