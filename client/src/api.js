@@ -15,8 +15,15 @@ export async function api(path, options = {}) {
       ...options.headers,
     },
   });
-  const body = await response.json();
-  if (!response.ok) throw new Error(body.error?.message || "Request failed.");
+  const text = await response.text();
+  let body = null;
+  try {
+    body = text ? JSON.parse(text) : null;
+  } catch {
+    throw new Error("The server returned an unexpected response.");
+  }
+  if (!response.ok)
+    throw new Error(body?.error?.message || "Request failed.");
   return body;
 }
 

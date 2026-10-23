@@ -112,7 +112,10 @@ app.get("/api/author/me", requireAuth, (req, res) => {
   if (req.user.role !== "author")
     return fail(res, 403, "FORBIDDEN", "Author access is required.");
   const author = findAuthor(req.user.authorId);
-  res.json({ ...author, books: undefined });
+  if (!author)
+    return fail(res, 404, "NOT_FOUND", "Author profile was not found.");
+  const { books: _books, ...profile } = author;
+  res.json(profile);
 });
 /** Returns only books owned by the signed-in author. */
 app.get("/api/author/books", requireAuth, (req, res) => {
