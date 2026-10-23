@@ -44,15 +44,15 @@ The frontend never decides which records are allowed. The API attaches a role to
 
 `server/ai.js` centralises model behavior. It sends the current ticket, a minimal relevant book summary, and only the applicable policy excerpt from `server/knowledge.js`. It does not send all author history or the whole knowledge base on every request. This reduces cost, limits data exposure, and gives more focused answers.
 
-By default `AI_MODE=local` provides deterministic classification and a policy-aware fallback draft. That means a provider outage can never prevent ticket creation or an admin response. To enable the OpenAI Responses API, set the following **server-only** values in `.env`:
+By default, missing or invalid Gemini configuration uses deterministic classification and a policy-aware local fallback draft. That means a provider outage can never prevent ticket creation or an admin response. To enable the Gemini Developer API, set the following **server-only** values in `.env`:
 
 ```ini
-AI_MODE=openai
-OPENAI_API_KEY=your_key_here
-OPENAI_MODEL=gpt-4o-mini
+AI_MODE=gemini
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
-`gpt-4o-mini` is a reasonable low-cost option for short classification and drafting. Provider errors, rate limits, blank replies, or missing configuration are caught and replaced with the local draft; the API key is never exposed to the browser.
+`gemini-3.5-flash-lite` is configured as the default because Gemini currently lists it on its free tier. Provider errors, rate limits, blank replies, or missing configuration are caught and replaced with the local draft; the API key is never exposed to the browser.
 
 ## REST API
 

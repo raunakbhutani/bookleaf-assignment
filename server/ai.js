@@ -3,7 +3,7 @@ import { policyFor } from "./knowledge.js";
 /**
  * This module is the only place that knows about AI providers. It defaults to
  * a deterministic local fallback so tickets remain usable with no API key.
- * Set OPENAI_API_KEY and AI_MODE=openai to turn on the server-side API call.
+ * Set GEMINI_API_KEY and AI_MODE=gemini to use the server-side Gemini API.
  */
 const categoryRules = [
   ["Royalty & Payments", /royalt|payout|payment|bank|earnings|sold|sale/i],
@@ -63,35 +63,41 @@ export function draftLocally(ticket, author, book) {
 }
 
 /**
- * Requests compact JSON from OpenAI, falling back safely if the call fails.
+ * Requests a concise Gemini response, falling back safely if the call fails.
  * The prompt includes only the current ticket, relevant book data, and one
  * policy excerpt to minimise token use and avoid sending ticket history.
  */
 export async function generateDraft(ticket, author, book) {
-  if (process.env.AI_MODE !== "openai" || !process.env.OPENAI_API_KEY)
+  if (process.env.AI_MODE !== "gemini" || !process.env.GEMINI_API_KEY)
     return {
       text: draftLocally(ticket, author, book),
       source: "local fallback",
     };
   try {
     const prompt = `You are an empathetic BookLeaf support representative. Draft a concise reply. Acknowledge the concern, use concrete data if supplied, own BookLeaf errors, provide a timeline, and end with a next step. Do not invent facts.\n\nTicket: ${ticket.subject}\n${ticket.description}\nCategory: ${ticket.category}\nAuthor: ${author.name}\nBook: ${book ? `${book.title}; status ${book.status}; pending royalty ${book.royalty_pending ?? 0}` : "Account-level"}\nPolicy: ${policyFor(ticket.category)}`;
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-        input: prompt,
-        max_output_tokens: 350,
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          maxOutputTokens: 350,
+          temperature: 0.35,
+        },
       }),
     });
     if (!response.ok) throw new Error(`provider returned ${response.status}`);
     const body = await response.json();
-    const text = body.output_text?.trim();
+    const text = body.candidates?.[0]?.content?.parts
+      ?.map((part) => part.text || "")
+      .join("")
+      .trim();
     if (!text) throw new Error("provider returned no text");
-    return { text, source: "OpenAI" };
+    return { text, source: `Gemini (${model})` };
   } catch (error) {
     console.warn("AI drafting failed; using fallback:", error.message);
     return {
