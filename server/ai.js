@@ -75,7 +75,7 @@ export async function generateDraft(ticket, author, book) {
     };
   try {
     const prompt = `You are an empathetic BookLeaf support representative. Draft a concise reply. Acknowledge the concern, use concrete data if supplied, own BookLeaf errors, provide a timeline, and end with a next step. Do not invent facts.\n\nTicket: ${ticket.subject}\n${ticket.description}\nCategory: ${ticket.category}\nAuthor: ${author.name}\nBook: ${book ? `${book.title}; status ${book.status}; pending royalty ${book.royalty_pending ?? 0}` : "Account-level"}\nPolicy: ${policyFor(ticket.category)}`;
-    const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+    const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
     const response = await fetch(endpoint, {
       method: "POST",
@@ -86,7 +86,6 @@ export async function generateDraft(ticket, author, book) {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           maxOutputTokens: 350,
-          temperature: 0.35,
         },
       }),
     });

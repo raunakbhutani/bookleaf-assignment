@@ -49,10 +49,10 @@ By default, missing or invalid Gemini configuration uses deterministic classific
 ```ini
 AI_MODE=gemini
 GEMINI_API_KEY=your_key_here
-GEMINI_MODEL=gemini-3.5-flash-lite
+GEMINI_MODEL=gemini-3.8-flash
 ```
 
-`gemini-3.5-flash-lite` is configured as the default because Gemini currently lists it on its free tier. Provider errors, rate limits, blank replies, or missing configuration are caught and replaced with the local draft; the API key is never exposed to the browser.
+`gemini-3.8-flash` is configured as the default because Gemini currently lists its standard free-tier input and output usage as free of charge, subject to rate limits. Provider errors, rate limits, blank replies, or missing configuration are caught and replaced with the local draft; the API key is never exposed to the browser.
 
 ## REST API
 
