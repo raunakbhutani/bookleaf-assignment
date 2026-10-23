@@ -1,5 +1,7 @@
 # BookLeaf Portal: approach and trade-offs
 
+**Live demo:** [https://bookleaf-assignment-nine.vercel.app/](https://bookleaf-assignment-nine.vercel.app/)
+
 I prioritised the operational loop that reduces support backlog: an author sees their real book and royalty data, submits a clear ticket, and an operator receives a pre-triaged queue plus an editable policy-aware response. The interface presents in-production and zero-royalty records rather than treating them as exceptional cases. It is deliberately calm and scannable: the author gets simple account context, while operations gets urgency-first triage and an intentional separation between private notes and author-visible replies.
 
 The app uses React for the two role-specific experiences and an Express REST API for authorization and business logic. The supplied nested JSON remains the source seed and is flattened in the server for fast, explicit owner checks. This avoids a misleading frontend-only authorization model: authors can only request their own resources, while admin endpoints are guarded by a separate role check. For an assignment setup, ticket mutations and sessions are in memory. That lowers setup friction, but a production version would use PostgreSQL, database migrations, password hashing, signed HTTP-only sessions, audit records and a durable event/worker system.

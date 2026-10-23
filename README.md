@@ -2,6 +2,12 @@
 
 A full-stack take-home implementation for BookLeaf Publishing. It provides an author-facing dashboard and a role-protected operations workspace, using the supplied 10-author / 18-book dataset directly.
 
+## Live demo
+
+Frontend: [https://bookleaf-assignment-nine.vercel.app/](https://bookleaf-assignment-nine.vercel.app/)
+
+The frontend uses the API URL configured in Vercel as `VITE_API_URL` (the Render service URL ending in `/api`). Tickets and demo sessions are stored in memory and may reset when the API restarts.
+
 ## Run locally
 
 ```bash
